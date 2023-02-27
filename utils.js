@@ -1,8 +1,8 @@
-export const lerp = (a, b, t) => {
+function lerp(a, b, t) {
     return a + (b - a) * t;
 }
 
-export const getRGBA = (value) => {
+function getRGBA(value) {
     const red = value < 0 ? 0 : 255;
     const green = red;
     const blue = value > 0 ? 0 : 255;
@@ -11,7 +11,7 @@ export const getRGBA = (value) => {
     return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 }
 
-export const getIntersection = (a, b, c, d) => {
+function getIntersection(a, b, c, d) {
     const tTop = (d.x - c.x) * (a.y - c.y) - (d.y - c.y) * (a.x - c.x);
     const uTop = (c.y - a.y) * (a.x - b.x) - (c.x - a.x) * (a.y - b.y);
     const bottom = (d.y - c.y) * (b.x - a.x) - (d.x - c.x) * (b.y - a.y);
@@ -32,7 +32,7 @@ export const getIntersection = (a, b, c, d) => {
     return null;
 }
 
-export const polysIntersect = (a, b) => {
+function polysIntersect(a, b) {
     return a.some((aSegment, i) =>
         b.some((bSegment, j) =>
             getIntersection(

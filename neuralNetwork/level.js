@@ -1,40 +1,48 @@
 class Level {
     constructor(inputCount, outputCount) {
-        this.inputs = Array.from({
-            length: inputCount
-        });
-        this.outputs = Array.from({
-            length: outputCount
-        });
-        this.biases = new Array(outputCount).fill(0);
+        this.inputs = new Array(inputCount);
+        this.outputs = new Array(outputCount);
+        this.biases = new Array(outputCount);
 
-        this.weights = Array.from({
-            length: inputCount
-        }, () =>
-            new Array(outputCount)
-        );
+        this.weights = [];
+
+        for (let i = 0; i < inputCount; i++) {
+            this.weights[i] = new Array(outputCount);
+        }
 
         Level.#randomize(this);
     }
 
     static #randomize(level) {
-        level.weights = level.weights.map(row => {
-            return row.map(() => Math.random() * 2 - 1);
-        });
+        for (let i = 0; i < level.inputs.length; i++) {
+            for (let j = 0; j < level.outputs.length; j++) {
+                level.weights[i][j] = Math.random() * 2 - 1;
+            }
+        }
 
-        level.biases = level.biases.map(() => Math.random() * 2 - 1);
+        for (let i = 0; i < level.biases.length; i++) {
+            level.biases[i] = Math.random() * 2 - 1;
+        }
     }
 
     static feedForward(givenInputs, level) {
-        level.inputs = givenInputs;
+        for (let i = 0; i < level.inputs.length; i++) {
+            level.inputs[i] = givenInputs[i];
+        }
 
-        level.outputs = level.weights[0].map((_, i) => {
-            const sum = level.inputs.reduce((acc, input, j) => {
-                return acc + input * level.weights[j][i];
-            }, 0);
+        for (let i = 0; i < level.outputs.length; i++) {
+            let sum = 0;
 
-            return sum > level.biases[i] ? 1 : 0;
-        });
+            for (let j = 0; j < level.inputs.length; j++) {
+                sum += level.inputs[j] * level.weights[j][i];
+            }
+
+            if (sum > level.biases[i]) {
+                level.outputs[i] = 1;
+            } else {
+                level.outputs[i] = 0;
+            }
+        }
 
         return level.outputs;
     }

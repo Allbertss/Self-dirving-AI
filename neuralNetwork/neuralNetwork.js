@@ -1,5 +1,3 @@
-import { lerp } from "../utils";
-
 class NeuralNetwork {
     constructor(neurons) {
         this.levels = [];

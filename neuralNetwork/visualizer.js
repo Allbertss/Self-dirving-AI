@@ -1,29 +1,32 @@
-import { lerp } from "../utils";
-import { getRGBA } from "../utils";
-
 class Visualizer {
     static drawNetwork(ctx, network) {
         const margin = 50;
-        const { canvas: { width, height } } = ctx;
         const left = margin;
         const top = margin;
+        const width = ctx.canvas.width - margin * 2;
+        const height = ctx.canvas.height - margin * 2;
+
         const levelHeight = height / network.levels.length;
 
-        const levelOptions = (level) => {
-            const arrows = level === network.levels.length - 1 ? ['🠉', '🠈', '🠊', '🠋'] : [];
-            const dashed = level === network.levels.length - 1 ? [7, 3] : [];
+        for (let i = network.levels.length - 1; i >= 0; i--) {
+            const levelTop = top +
+                lerp(
+                    height - levelHeight,
+                    0,
+                    network.levels.length == 1
+                        ? 0.5
+                        : i / (network.levels.length - 1)
+                );
 
-            return { arrows, dashed };
-        };
-
-        range(network.levels.length - 1, -1, -1).forEach((level) => {
-            const levelTop = top + lerp(height - levelHeight, 0, network.levels.length === 1 ? 0.5 : level / (network.levels.length - 1));
-            const { arrows, dashed } = levelOptions(level);
-
-            ctx.setLineDash(dashed);
-
-            Visualizer.drawLevel(ctx, network.levels[level], left, levelTop, width, levelHeight, arrows);
-        });
+            ctx.setLineDash([7, 3]);
+            Visualizer.drawLevel(ctx, network.levels[i],
+                left, levelTop,
+                width, levelHeight,
+                i == network.levels.length - 1
+                    ? ['🠉', '🠈', '🠊', '🠋']
+                    : []
+            );
+        }
     }
 
     static drawLevel(ctx, level, left, top, width, height, outputLabels) {
@@ -32,56 +35,50 @@ class Visualizer {
 
         const { inputs, outputs, weights, biases } = level;
 
-        const drawConnection = (i, j) => {
-            ctx.beginPath();
-            ctx.moveTo(
-                Visualizer.#getNode(inputs, i, left, right),
-                bottom
-            );
-            ctx.lineTo(
-                Visualizer.#getNode(outputs, j, left, right),
-                top
-            );
-            ctx.lineWidth = 2;
-            ctx.strokeStyle = getRGBA(weights[i][j]);
-            ctx.stroke();
-        };
-
-        inputs.forEach((_, i) => {
-            outputs.forEach((_, j) => {
-                drawConnection(i, j);
-            });
-        });
+        for (let i = 0; i < inputs.length; i++) {
+            for (let j = 0; j < outputs.length; j++) {
+                ctx.beginPath();
+                ctx.moveTo(
+                    Visualizer.#getNodeX(inputs, i, left, right),
+                    bottom
+                );
+                ctx.lineTo(
+                    Visualizer.#getNodeX(outputs, j, left, right),
+                    top
+                );
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = getRGBA(weights[i][j]);
+                ctx.stroke();
+            }
+        }
 
         const nodeRadius = 18;
-
-        inputs.forEach((value, i) => {
-            const x = Visualizer.#getNode(inputs, i, left, right);
+        for (let i = 0; i < inputs.length; i++) {
+            const x = Visualizer.#getNodeX(inputs, i, left, right);
             ctx.beginPath();
             ctx.arc(x, bottom, nodeRadius, 0, Math.PI * 2);
-            ctx.fillStyle = 'black';
+            ctx.fillStyle = "black";
             ctx.fill();
             ctx.beginPath();
             ctx.arc(x, bottom, nodeRadius * 0.6, 0, Math.PI * 2);
-            ctx.fillStyle = getRGBA(value);
+            ctx.fillStyle = getRGBA(inputs[i]);
             ctx.fill();
-        });
+        }
 
-        outputs.forEach((value, i) => {
-            const node = Visualizer.#getNode(outputs, i, left, right);
-
+        for (let i = 0; i < outputs.length; i++) {
+            const x = Visualizer.#getNodeX(outputs, i, left, right);
             ctx.beginPath();
-            ctx.arc(node, top, nodeRadius, 0, Math.PI * 2);
-            ctx.fillStyle = 'black';
+            ctx.arc(x, top, nodeRadius, 0, Math.PI * 2);
+            ctx.fillStyle = "black";
             ctx.fill();
             ctx.beginPath();
-            ctx.arc(node, top, nodeRadius * 0.6, 0, Math.PI * 2);
-            ctx.fillStyle = getRGBA(value);
+            ctx.arc(x, top, nodeRadius * 0.6, 0, Math.PI * 2);
+            ctx.fillStyle = getRGBA(outputs[i]);
             ctx.fill();
 
             ctx.beginPath();
             ctx.lineWidth = 2;
-            ctx.arc(node, top, nodeRadius * 0.8, 0, Math.PI * 2);
+            ctx.arc(x, top, nodeRadius * 0.8, 0, Math.PI * 2);
             ctx.strokeStyle = getRGBA(biases[i]);
             ctx.setLineDash([3, 3]);
             ctx.stroke();
@@ -89,21 +86,25 @@ class Visualizer {
 
             if (outputLabels[i]) {
                 ctx.beginPath();
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillStyle = 'black';
-                ctx.strokeStyle = 'white';
-                ctx.font = nodeRadius * 1.5 + 'px Arial';
-                ctx.fillText(outputLabels[i], node, top + nodeRadius * 0.1);
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillStyle = "black";
+                ctx.strokeStyle = "white";
+                ctx.font = (nodeRadius * 1.5) + "px Arial";
+                ctx.fillText(outputLabels[i], x, top + nodeRadius * 0.1);
                 ctx.lineWidth = 0.5;
-                ctx.strokeText(outputLabels[i], node, top + nodeRadius * 0.1);
+                ctx.strokeText(outputLabels[i], x, top + nodeRadius * 0.1);
             }
-        });
+        }
     }
 
-    static #getNode(nodes, index, left, right) {
-        const position = nodes.length === 1 ? 0.5 : index / (nodes.length - 1);
-
-        return lerp(left, right, position);
+    static #getNodeX(nodes, index, left, right) {
+        return lerp(
+            left,
+            right,
+            nodes.length == 1
+                ? 0.5
+                : index / (nodes.length - 1)
+        );
     }
 }
