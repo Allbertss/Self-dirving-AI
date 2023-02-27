@@ -1,10 +1,16 @@
 class Level {
     constructor(inputCount, outputCount) {
-        this.inputs = Array.from({ length: inputCount });
-        this.outputs = Array.from({ length: outputCount });
+        this.inputs = Array.from({
+            length: inputCount
+        });
+        this.outputs = Array.from({
+            length: outputCount
+        });
         this.biases = new Array(outputCount).fill(0);
 
-        this.weights = Array.from({ length: inputCount }, () =>
+        this.weights = Array.from({
+            length: inputCount
+        }, () =>
             new Array(outputCount)
         );
 

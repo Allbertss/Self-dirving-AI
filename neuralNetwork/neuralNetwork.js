@@ -1,8 +1,10 @@
+import { lerp } from "../utils";
+
 class NeuralNetwork {
     constructor(neurons) {
         this.levels = [];
 
-        neuronCounts.slice(0, -1).forEach((count, i) => {
+        neurons.slice(0, -1).forEach((count, i) => {
             this.levels.push(new Level(count, neurons[i + 1]));
         });
     }
