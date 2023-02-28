@@ -22,6 +22,9 @@ class Car {
         }
 
         this.controls = new Controls(controlType);
+
+        this.image = new Image();
+        this.image.src = `images/car${getRandomInteger(7)}.png`;
     }
 
     update(roadBorders, traffic) {
@@ -47,23 +50,35 @@ class Car {
     }
 
     draw(ctx, color, drawSensor = false) {
-        if (this.hit) {
-            ctx.fillStyle = 'gray';
-        } else {
-            ctx.fillStyle = color;
-        }
-
-        ctx.beginPath();
-        ctx.moveTo(
-            this.polygon[0].x,
-            this.polygon[0].y
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(-this.angle);
+        ctx.drawImage(
+            this.image,
+            -this.width / 2,
+            -this.height / 2,
+            this.width,
+            this.height
         );
+        ctx.restore();
 
-        this.polygon.slice(1).forEach(point => {
-            ctx.lineTo(point.x, point.y);
-        });
+        // if (this.hit) {
+        //     ctx.fillStyle = 'gray';
+        // } else {
+        //     ctx.fillStyle = color;
+        // }
 
-        ctx.fill();
+        // ctx.beginPath();
+        // ctx.moveTo(
+        //     this.polygon[0].x,
+        //     this.polygon[0].y
+        // );
+
+        // this.polygon.slice(1).forEach(point => {
+        //     ctx.lineTo(point.x, point.y);
+        // });
+
+        // ctx.fill();
 
         if (this.sensor && drawSensor) {
             this.sensor.draw(ctx);
