@@ -1,4 +1,4 @@
-const carCount = 1;
+const carCount = 500;
 const laneCount = 3;
 
 const carCanvas = document.getElementById('carCanvas');
@@ -57,8 +57,14 @@ const update = (time) => {
         }
     });
 
-    cars.forEach(car => {
+    cars.forEach((car, index) => {
         car.update(road.borders, traffic);
+
+        if (car.controlType === 'AI') {
+            if (bestCar.y + carCanvas.height < car.y) {
+                cars.splice(index, 1);
+            }
+        }
     });
 
     bestCar = cars.find(car => car.y === Math.min(...cars.map(c => c.y)));
