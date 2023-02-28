@@ -80,18 +80,18 @@ const draw = (time) => {
     road.draw(carCtx);
 
     traffic.forEach(car => {
-        car.draw(carCtx, 'red');
+        car.draw(carCtx);
     });
 
     carCtx.globalAlpha = .2;
 
     cars.forEach(car => {
-        car.draw(carCtx, 'blue');
+        car.draw(carCtx);
     });
 
     carCtx.globalAlpha = 1;
 
-    bestCar.draw(carCtx, 'green', true);
+    bestCar.draw(carCtx, true);
 
     carCtx.restore();
 
