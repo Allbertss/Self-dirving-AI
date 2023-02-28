@@ -6,8 +6,9 @@ const networkCanvas = document.getElementById('networkCanvas');
 const carCtx = carCanvas.getContext('2d');
 const networkCtx = networkCanvas.getContext('2d');
 
-let lastFrameTime = performance.now();
 let fps = 0;
+let frameCount = 0;
+let lastFrameTime = performance.now();
 
 carCanvas.width = 200;
 networkCanvas.width = 300;
@@ -35,13 +36,25 @@ const drawFps = (ctx) => {
 const handleFps = (time) => {
     fps = Math.floor(1 / ((performance.now() - lastFrameTime) / 1000));
     lastFrameTime = time;
+    frameCount++;
 };
 
 const update = (time) => {
     handleFps(time);
 
-    traffic.forEach(car => {
+    if (frameCount % 250 === 0) {
+        traffic.push(new Car(road.getLaneCenter(getRandomInteger(laneCount)), bestCar.y - carCanvas.height, 30, 50, 'TRAFFIC', getRandomFloat(2.5, .75)),);
+        traffic.push(new Car(road.getLaneCenter(getRandomInteger(laneCount)), bestCar.y - carCanvas.height, 30, 50, 'TRAFFIC', getRandomFloat(2.5, .75)),);
+    }
+
+    traffic.forEach((car, index) => {
         car.update(road.borders, []);
+
+        if (car.controlType === 'TRAFFIC') {
+            if (bestCar.y + carCanvas.height < car.y) {
+                traffic.splice(index, 1);
+            }
+        }
     });
 
     cars.forEach(car => {

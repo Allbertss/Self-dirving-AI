@@ -11,7 +11,8 @@ class Car {
         this.friction = .05;
         this.angle = 0;
         this.hit = false;
-        this.useBrain = controlType === 'AI';
+        this.controlType = controlType;
+        this.useBrain = this.controlType === 'AI';
 
         if (this.useBrain) {
             this.sensor = new Sensor(this);
