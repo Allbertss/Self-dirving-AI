@@ -44,3 +44,11 @@ function polysIntersect(a, b) {
         )
     );
 }
+
+function getRandomInteger(max, min = 0) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function getRandomFloat(max, min = 0) {
+    return Math.random() * (max - min + 1) + min;
+}

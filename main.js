@@ -6,6 +6,9 @@ const networkCanvas = document.getElementById('networkCanvas');
 const carCtx = carCanvas.getContext('2d');
 const networkCtx = networkCanvas.getContext('2d');
 
+let lastFrameTime = performance.now();
+let fps = 0;
+
 carCanvas.width = 200;
 networkCanvas.width = 300;
 
@@ -23,7 +26,20 @@ const remove = () => {
     localStorage.removeItem('bestBrain');
 };
 
-const update = () => {
+const drawFps = (ctx) => {
+    ctx.fillStype = 'black';
+    ctx.font = 'normal 16pt Arial';
+    ctx.fillText(`${fps} fps`, 15, 26);
+};
+
+const handleFps = (time) => {
+    fps = Math.floor(1 / ((performance.now() - lastFrameTime) / 1000));
+    lastFrameTime = time;
+};
+
+const update = (time) => {
+    handleFps(time);
+
     traffic.forEach(car => {
         car.update(road.borders, []);
     });
@@ -64,25 +80,21 @@ const draw = (time) => {
 
     Visualizer.drawNetwork(networkCtx, bestCar.brain);
 
-    requestAnimationFrame(animate);
+    requestAnimationFrame(loop);
+
+    drawFps(carCtx);
 };
 
-const animate = (time) => {
-    update();
-
+const loop = (time) => {
+    update(time);
     draw(time);
 }
 
 const road = new Road(carCanvas.width / 2, carCanvas.width * .9, laneCount);
 const cars = generateCars(carCount);
 const traffic = [
-    new Car(road.getLaneCenter(1), -100, 30, 50, 'TRAFFIC', 2),
-    new Car(road.getLaneCenter(0), -300, 30, 50, 'TRAFFIC', 2),
-    new Car(road.getLaneCenter(2), -100, 30, 50, 'TRAFFIC', 2),
-    new Car(road.getLaneCenter(0), -500, 30, 50, 'TRAFFIC', 2),
-    new Car(road.getLaneCenter(1), -500, 30, 50, 'TRAFFIC', 2),
-    new Car(road.getLaneCenter(1), -700, 30, 50, 'TRAFFIC', 2),
-    new Car(road.getLaneCenter(2), -700, 30, 50, 'TRAFFIC', 2),
+    new Car(road.getLaneCenter(getRandomInteger(laneCount)), -carCanvas.width * 4, 30, 50, 'TRAFFIC', getRandomFloat(2.5, .75)),
+    new Car(road.getLaneCenter(getRandomInteger(laneCount)), -carCanvas.width * 4, 30, 50, 'TRAFFIC', getRandomFloat(2.5, .75)),
 ];
 
 let bestCar = cars[0];
@@ -97,4 +109,4 @@ if (localStorage.getItem('bestBrain')) {
     });
 }
 
-animate();
+loop();
