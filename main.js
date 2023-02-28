@@ -1,4 +1,4 @@
-const carCount = 500;
+const carCount = 1;
 const laneCount = 3;
 
 const carCanvas = document.getElementById('carCanvas');
@@ -13,17 +13,17 @@ const generateCars = (carCount) => {
     return Array.from({
         length: carCount
     }, () => new Car(road.getLaneCenter(1), 100, 30, 50, 'AI'));
-}
+};
 
 const save = () => {
     localStorage.setItem('bestBrain', JSON.stringify(bestCar.brain));
-}
+};
 
 const remove = () => {
     localStorage.removeItem('bestBrain');
-}
+};
 
-const animate = (time) => {
+const update = () => {
     traffic.forEach(car => {
         car.update(road.borders, []);
     });
@@ -33,7 +33,9 @@ const animate = (time) => {
     });
 
     bestCar = cars.find(car => car.y === Math.min(...cars.map(c => c.y)));
+};
 
+const draw = (time) => {
     carCanvas.height = window.innerHeight;
     networkCanvas.height = window.innerHeight;
 
@@ -63,6 +65,12 @@ const animate = (time) => {
     Visualizer.drawNetwork(networkCtx, bestCar.brain);
 
     requestAnimationFrame(animate);
+};
+
+const animate = (time) => {
+    update();
+
+    draw(time);
 }
 
 const road = new Road(carCanvas.width / 2, carCanvas.width * .9, laneCount);
