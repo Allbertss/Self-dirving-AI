@@ -30,8 +30,20 @@ const remove = () => {
 const drawFps = (ctx) => {
     ctx.fillStype = 'black';
     ctx.font = 'normal 16pt Arial';
-    ctx.fillText(`${fps} fps`, 15, 26);
+    ctx.fillText(`${fps} fps`, 15, 25);
 };
+
+const drawCarCount = (ctx) => {
+    ctx.fillStype = 'black';
+    ctx.font = 'normal 16pt Arial';
+    ctx.fillText(`${cars.length} cars`, 15, 50);
+}
+
+const drawTrafficCount = (ctx) => {
+    ctx.fillStype = 'black';
+    ctx.font = 'normal 16pt Arial';
+    ctx.fillText(`${traffic.length} traffic`, 15, 75);
+}
 
 const handleFps = (time) => {
     fps = Math.floor(1 / ((performance.now() - lastFrameTime) / 1000));
@@ -102,6 +114,8 @@ const draw = (time) => {
     requestAnimationFrame(loop);
 
     drawFps(carCtx);
+    drawCarCount(carCtx);
+    drawTrafficCount(carCtx);
 };
 
 const loop = (time) => {
